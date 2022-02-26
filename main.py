@@ -1,13 +1,11 @@
 import cv2
 import numpy as np
-import matplotlib as plt
-
+import matplotlib.pyplot as plt
 
 def display_image(label, image):
     cv2.imshow(label, image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-
 
 path = r'C:\Users\MediMonster\Documents\HELHa\ProjetRD\openCV\resistor_project\R6800.jpeg'
 path_2 = r'C:\Users\MediMonster\Documents\HELHa\ProjetRD\openCV\resistor_project\color_sample.png'
@@ -48,6 +46,23 @@ output_red = cv2.bitwise_and(img, img, mask=red_mask)
 # output_braun = cv2.bitwise_and(img, img, mask = braun_mask)
 # output_gray = cv2.bitwise_and(img, img, mask = gray_mask)
 
-display_image("Masked image", np.hstack((img, output_red)))
+output_red = cv2.cvtColor(output_red, cv2.COLOR_HSV2BGR)
+gray_output_red = cv2.cvtColor(output_red, cv2.COLOR_BGR2GRAY)
 
+ret, thresh = cv2.threshold(src=gray_output_red, thresh=127, maxval=255, type=0)
+# plt.imshow(output_red)
+# plt.show()
+
+M = cv2.moments(thresh)
+
+cX = int(M["m10"] / M["m00"])
+cY = int(M["m01"] / M["m00"])
+
+print("Centroïde : ", cX, " , ", cY)
+cv2.circle(output_red, (cX, cY), 5, (255, 0, 0), -1)
+cv2.putText(output_red, "centroid", (cX - 25, cY - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+
+display_image("Centroïde", output_red)
+plt.imshow(output_red)
+plt.show()
 print("j'ai fini")
