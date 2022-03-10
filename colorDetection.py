@@ -91,6 +91,7 @@ class Color:
             display_image(self.color_name + " masked", img, self.img_masked)
         # return cv2.bitwise_and(img, img, mask=color_mask)
 
+
     def get_nonzero_pixel(self):
         output_color = cv2.cvtColor(self.img_masked, cv2.COLOR_HSV2BGR)
         gray_output_color = cv2.cvtColor(output_color, cv2.COLOR_BGR2GRAY)

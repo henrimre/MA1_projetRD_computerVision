@@ -41,6 +41,7 @@ color_array = np.array([black.get_center(img, img_hsv),
                         white.get_center(img, img_hsv)])
 
 print(color_array)
+
 non_zero_element = np.nonzero(color_array[:, 1])
 non_zero_element = np.transpose(non_zero_element)
 print(non_zero_element[1])
