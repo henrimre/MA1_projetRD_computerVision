@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
 from colorDetection import *
 
 path = r'C:\Users\henri\Documents\HELHa\ProjetRD_image\R6800.jpeg'
@@ -46,5 +47,14 @@ non_zero_element = np.nonzero(color_array[:, 1])
 non_zero_element = np.transpose(non_zero_element)
 print(non_zero_element[1])
 
+color_array[color_array != [0, 0]]
+print("Color array without zero_element")
 
-resistor_value = 0
+for n in range(len(color_array)):
+    print("index ", n)
+
+    if color_array[n] != 0:
+        color_array.pop(n)
+        print("delete index n° ", n)
+
+print(color_array)
