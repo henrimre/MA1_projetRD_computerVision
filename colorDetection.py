@@ -28,11 +28,11 @@ def get_linear_regression(color_array, display=None):
 
     model = LinearRegression()
     model.fit(x, y)
+
     if display is not None:
         x_fit = np.linspace(0, 50, 1000)
         x_fit_s1 = x_fit.shape
-        x_fit = x_fit[:,
-                np.newaxis]  # 2eme facon de creer le vecteur de 1000 valeurs entre 0 et 10 régulierement espacees
+        x_fit = x_fit[:, np.newaxis]  # 2eme facon de creer le vecteur de 1000 valeurs entre 0 et 10 régulierement espacees
         x_fit_s2 = x_fit.shape
         y_fit = model.predict(x_fit)  # Creation vecteur y_fit à partir de x_fit par prediction
         print(x_fit_s1, x_fit_s2)  # Preuve que les deux facons reviennent au même

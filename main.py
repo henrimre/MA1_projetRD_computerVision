@@ -1,7 +1,6 @@
 from colorDetection import *
 
 path = r'C:\Users\henri\Documents\HELHa\ProjetRD_image\R6800.jpeg'
-#path_2 = r'C:\Users\MediMonster\Documents\HELHa\ProjetRD\openCV\resistor_project\color_sample.png'
 img, img_hsv = img_preprocessing(path)
 
 black = Color("noir", 0, 1, np.array([0, 0, 0]), np.array([0, 0, 0]))
@@ -40,6 +39,13 @@ color_array = np.array([black.get_center(img, img_hsv),
 print(color_array)
 
 get_linear_regression(color_array, True)
+
+"""
+Il faut déterminer le sens de la résistance, si elle est horizontale ou verticale
+"""
+
+
+
 """
 non_zero_element = np.nonzero(color_array[:, 1])
 non_zero_element = np.transpose(non_zero_element)
@@ -59,48 +65,5 @@ print(len(res))
 res = np.delete(res, np.s_[::1], axis=1)
 print(res)
 """
-"""
-print(color_array[:, 0])
-#print(len(color_array[:,0]))
-
-
-creation_array = False
-for i in range(len(color_array[:, 0])):
-    print(i)
-    if color_array[i, 0] == 0:
-        if not creation_array:
-            list_elem_delete = np.array(i)
-            creation_array = True
-        else:
-            list_elem_delete = np.append(list_elem_delete, i)
-        #print("delete index")
-
-color_array_without_0 = np.delete(color_array, list_elem_delete, axis=0)
-#print("color_array_without_0 v2")
-#print(color_array_without_0)
-
-x = color_array_without_0[:,0]
-x = x[:,np.newaxis]
-#print(x.shape)
-y = color_array_without_0[:,1]
-#print (y.shape)
-
-model = LinearRegression()
-model.fit(x, y)
-
-
-x_fit = np.linspace(0, 50, 1000) #1ere facon de creer le vecteur de 1000 valeurs entre 0 et 10 régulierement espacees
-x_fit_s1 = x_fit.shape
-x_fit = x_fit[:,np.newaxis] #2eme facon de creer le vecteur de 1000 valeurs entre 0 et 10 régulierement espacees
-x_fit_s2 = x_fit.shape
-y_fit = model.predict(x_fit) #Creation vecteur y_fit à partir de x_fit par prediction
-print(x_fit_s1, x_fit_s2) # Preuve que les deux facons reviennent au même
-
-plt.scatter(x, y)
-plt.plot([x_fit[0, 0], x_fit[999, 0]], [y_fit[0], y_fit[999]], 'r')
-
-plt.show()
-"""
-
 
 #print(color_array)
