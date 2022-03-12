@@ -36,9 +36,24 @@ def get_linear_regression(color_array, display=None):
         x_fit_s2 = x_fit.shape
         y_fit = model.predict(x_fit)  # Creation vecteur y_fit à partir de x_fit par prediction
         print(x_fit_s1, x_fit_s2)  # Preuve que les deux facons reviennent au même
+        print("y = ", model.coef_[0], " x + ", model.intercept_)
         plt.scatter(x, y)
         plt.plot([x_fit[0, 0], x_fit[999, 0]], [y_fit[0], y_fit[999]], 'r')
         plt.show()
+
+    #il faut parcourir la droite afin de déterminer l'ordre des points qu'on rencontre au fur et à mesure que l'on traverse la droite
+    #taille de l'image 60x83
+    k = 0
+    for i in range(60):
+        y_output = i*model.coef_[0] + model.intercept_
+        for j in range(len(color_array_without_0[:, 1])):
+            if y_output == color_array_without_0[j, 1]:
+                color_array_without_0[j, 2] = k
+                k += 1
+
+
+
+
 
 
 def find_contour_image(img):
@@ -114,6 +129,7 @@ class Color:
         self.cx = 0
         self.cy = 0
         self.img_masked = 0
+        self.order=0
 
     def get_masked_image(self, img, img_hsv, display=None):
         """
@@ -169,3 +185,7 @@ class Color:
                 plt.show()
 
         return self.cx, self.cy
+
+    def get_color_array_format (self, img, img_hsv):
+        self.get_center(img, img_hsv)
+        return self.cx, self.cy, self.value, self.order
