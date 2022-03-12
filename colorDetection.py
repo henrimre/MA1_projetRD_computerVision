@@ -7,7 +7,7 @@ from sklearn.linear_model import LinearRegression
 def get_linear_regression(color_array, display=None):
     creation_array = False
     for i in range(len(color_array[:, 0])):
-        print(i)
+        # print(i)
         if color_array[i, 0] == 0:
             if not creation_array:
                 list_elem_delete = np.array(i)
@@ -29,31 +29,48 @@ def get_linear_regression(color_array, display=None):
     model = LinearRegression()
     model.fit(x, y)
 
+    #version2
+    for i in range(len(color_array_without_0[:,0])):
+        m_2 = -1/model.coef_[0]
+        p_2 = color_array_without_0[i, 1] - (m_2*color_array_without_0[i, 0])
+        a = np.array([[1.0, -1*model.coef_[0]],
+                      [1.0, -1*m_2]])
+        b = np.array([model.intercept_, p_2])
+        color_array_without_0[i, 5], color_array_without_0[i, 4] = np.linalg.solve(a, b)
+
+        if display == 'projection':
+            print("point à projeter : ", color_array_without_0[i, 0], ";", color_array_without_0[i, 1])
+            print("point de projection: ", color_array_without_0[i, 4], ";", color_array_without_0[i, 5])
+
     if display is not None:
         x_fit = np.linspace(0, 50, 1000)
-        x_fit_s1 = x_fit.shape
-        x_fit = x_fit[:, np.newaxis]  # 2eme facon de creer le vecteur de 1000 valeurs entre 0 et 10 régulierement espacees
+        # 2eme facon de creer le vecteur de 1000 valeurs entre 0 et 10 régulierement espacees
+        x_fit = x_fit[:, np.newaxis]
         x_fit_s2 = x_fit.shape
         y_fit = model.predict(x_fit)  # Creation vecteur y_fit à partir de x_fit par prediction
-        print(x_fit_s1, x_fit_s2)  # Preuve que les deux facons reviennent au même
         print("y = ", model.coef_[0], " x + ", model.intercept_)
         plt.scatter(x, y)
-        plt.plot([x_fit[0, 0], x_fit[999, 0]], [y_fit[0], y_fit[999]], 'r')
+        plt.scatter(24.65, 42.61)
+        plt.scatter(color_array_without_0[:, 4], color_array_without_0[:, 5])
+        plt.plot([x_fit[0, 0], x_fit[999, 0]], [y_fit[0], y_fit[999]], 'r', )
+        plt.axis('equal')
         plt.show()
 
-    #il faut parcourir la droite afin de déterminer l'ordre des points qu'on rencontre au fur et à mesure que l'on traverse la droite
-    #taille de l'image 60x83
-    k = 0
-    for i in range(60):
+    # il faut parcourir la droite afin de déterminer l'ordre des points qu'on rencontre au fur et à mesure que l'on traverse la droite
+    # taille de l'image 60x83
+
+    """   k = 0
+    for i in range(0, 83):
         y_output = i*model.coef_[0] + model.intercept_
+        #print(y_output)
         for j in range(len(color_array_without_0[:, 1])):
             if y_output == color_array_without_0[j, 1]:
-                color_array_without_0[j, 2] = k
+                color_array_without_0[j, 3] = k
+                print("centroide détecté ", k)
                 k += 1
-
-
-
-
+    color_array_without_0 = color_array_without_0[color_array_without_0[:, 3].argsort()]
+    print(color_array_without_0)
+"""
 
 
 def find_contour_image(img):
@@ -129,7 +146,10 @@ class Color:
         self.cx = 0
         self.cy = 0
         self.img_masked = 0
-        self.order=0
+        self.order = 0
+        self.projection_linear_reg = 0
+        self.cx_proj = 0.0
+        self.cy_proj = 0.0
 
     def get_masked_image(self, img, img_hsv, display=None):
         """
@@ -186,6 +206,6 @@ class Color:
 
         return self.cx, self.cy
 
-    def get_color_array_format (self, img, img_hsv):
+    def get_color_array_format(self, img, img_hsv):
         self.get_center(img, img_hsv)
-        return self.cx, self.cy, self.value, self.order
+        return self.cx, self.cy, self.value, self.order, self.cx_proj, self.cy_proj
