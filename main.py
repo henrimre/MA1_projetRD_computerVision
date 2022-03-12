@@ -41,7 +41,8 @@ color_array = np.array([black.get_color_array_format(img, img_hsv),
 
 #print(color_array)
 
-get_linear_regression(color_array, 'projection')
+color_array_treated = get_linear_regression(color_array, True)
+calculate_resistor(color_array_treated)
 
 
 
