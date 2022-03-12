@@ -43,32 +43,3 @@ color_array = np.array([black.get_color_array_format(img, img_hsv),
 
 color_array_treated = get_linear_regression(color_array)
 calculate_resistor(color_array_treated)
-
-
-
-'''
-color_array = color_array[color_array[:, 1].argsort()]
-print("\n\n color_array sort :")
-print(color_array)
-'''
-
-
-"""
-non_zero_element = np.nonzero(color_array[:, 1])
-non_zero_element = np.transpose(non_zero_element)
-print(non_zero_element[1])
-
-for n in range(len(color_array)):
-    print("index ", n)
-    if color_array[n] != 0:
-        color_array = np.delete(color_array, n, axis=0)
-        print("delete index n° ", n)
-
-res = np.argwhere(color_array == 0)
-print("Index of zero element ")
-print(res)
-print(len(res))
-
-res = np.delete(res, np.s_[::1], axis=1)
-print(res)
-"""
