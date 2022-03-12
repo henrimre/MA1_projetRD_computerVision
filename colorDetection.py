@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
+import math
 
 
 def get_linear_regression(color_array, display=None):
@@ -81,9 +82,16 @@ def find_contour_image(img):
 
 
 def calculate_resistor(color_array_treated):
-    # on dispose d'un tableau dont l'ordre correspond à l'ordre des couleurs, il faut maintenant calculer la valeur de la résistance à partir des valeurs du tableau
+    # on dispose d'un tableau dont l'ordre correspond à l'ordre des couleurs, il faut maintenant calculer la valeur
+    # de la résistance à partir des valeurs du tableau
     # ! Il faut encore regarder dans quel ordre on lit les valeurs
-
+    resistor_value = 0
+    for i in range(len(color_array_treated[:, 0]) - 1):
+        resistor_value += color_array_treated[i, 2] * math.pow(10, len(color_array_treated[:, 2]) - i - 2)
+        #print("degré du 10 :", len(color_array_treated[:, 2]) -i -2)
+        #print(resistor_value)
+    resistor_value *= math.pow(10, color_array_treated[len(color_array_treated[:, 2]) - 1, 2])
+    print("Valeur de la résistance : ", resistor_value)
 
 
 def display_image(label, image, img_masked=None):
