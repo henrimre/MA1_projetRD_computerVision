@@ -1,4 +1,3 @@
-import numpy as np
 
 from colorDetection import *
 
@@ -16,16 +15,22 @@ violet = Color("violet", 7, 10e6, np.array([0, 0, 0]), np.array([0, 0, 0]))
 grey = Color("gris", 8, 100e6, np.array([0, 0, 80]), np.array([179, 35, 130]))
 white = Color("blanc", 9, 1e9, np.array([0, 0, 0]), np.array([0, 0, 0]))
 
+red.get_masked_image(img, img_hsv, True)
+blue.get_masked_image(img, img_hsv, True)
+grey.get_masked_image(img, img_hsv, True)
+
 a = black.get_center(img, img_hsv)
 b = brow.get_center(img, img_hsv)
-red.get_center(img, img_hsv)
+red.get_center(img, img_hsv, 2)
 orange.get_center(img, img_hsv)
 yellow.get_center(img, img_hsv)
 green.get_center(img, img_hsv)
-blue.get_center(img, img_hsv)
+blue.get_center(img, img_hsv, 2)
 violet.get_center(img, img_hsv)
-grey.get_center(img, img_hsv)
+grey.get_center(img, img_hsv, 2)
 white.get_center(img, img_hsv)
+
+
 
 color_array = np.array([black.get_color_array_format(img, img_hsv),
                         brow.get_color_array_format(img, img_hsv),
@@ -41,5 +46,5 @@ color_array = np.array([black.get_color_array_format(img, img_hsv),
 
 #print(color_array)
 
-color_array_treated = get_linear_regression(color_array)
+color_array_treated = get_linear_regression(color_array, 1)
 calculate_resistor(color_array_treated)
