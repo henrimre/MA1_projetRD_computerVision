@@ -61,9 +61,8 @@ def get_linear_regression(color_array, display=None):
         y_fit = model.predict(x_fit)  # Creation vecteur y_fit à partir de x_fit par prediction
         # print("y = ", model.coef_[0], " x + ", model.intercept_)
         plt.scatter(x, y)
-        plt.scatter(24.65, 42.61)
         plt.scatter(color_array_without_0[:, 4], color_array_without_0[:, 5])
-        plt.plot([x_fit[0, 0], x_fit[999, 0]], [y_fit[0], y_fit[999]], 'r', )
+        plt.plot([x_fit[0, 0], x_fit[999, 0]], [y_fit[0], y_fit[999]], 'b', )
         plt.axis('equal')
         plt.show()
 
@@ -112,11 +111,6 @@ def display_image(label, image, img_masked=None):
 
 
 def img_preprocessing(path):
-    """
-    Transform the image
-    :param path:
-    :return: img, img_hsv
-    """
     return cv2.imread(path), cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2HSV)
 
 
@@ -137,13 +131,6 @@ def init_color_object():
 
 class Color:
     def __init__(self, color_name, value, multiplier, dark_color, light_color):
-        """
-        Constructor of the object Color
-        :param value: The numeric value of the color
-        :param multiplier: The multiplier value of the color
-        :param dark_color: The dark_color as np.array (HSV format)
-        :param light_color: The light_color as np.array (HSV format)
-        """
         self.value = value
         self.multiplier = multiplier
         self.dark_color = dark_color
