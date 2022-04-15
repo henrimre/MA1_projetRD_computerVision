@@ -83,14 +83,29 @@ def find_contour_image(img):
 def calculate_resistor(color_array_treated):
     # on dispose d'un tableau dont l'ordre correspond à l'ordre des couleurs, il faut maintenant calculer la valeur
     # de la résistance à partir des valeurs du tableau
-    # ! Il faut encore regarder dans quel ordre on lit les valeurs
+    # ! Il faut encore regarder dans quel ordre on lit les valeurs : pour le moment on se refère à la couleur gold, qui
+    # donne la valeur de la précision de la résistance et qui n'est pas utilisée pour les valeurs de la résistance
     resistor_value = 0
-    for i in range(len(color_array_treated[:, 0]) - 1):
-        resistor_value += color_array_treated[i, 2] * math.pow(10, len(color_array_treated[:, 2]) - i - 2)
-        #print("degré du 10 :", len(color_array_treated[:, 2]) -i -2)
-        #print(resistor_value)
-    resistor_value *= math.pow(10, color_array_treated[len(color_array_treated[:, 2]) - 1, 2])
-    print("Valeur de la résistance : ", resistor_value)
+    order = 0
+    # Déterminer l'emplacement de la couleur gold :
+    if color_array_treated[len(color_array_treated)-1, 2] == -1:
+        order = 1
+    elif color_array_treated[0, 2] == -1:
+        order = 1
+        color_array_treated = np.flip(color_array_treated, axis=0)
+        print("flip color_array_treated")
+        # print(color_array_treated)
+
+    if order != 0:
+        for i in range(len(color_array_treated[:, 0]) - 2):
+            # print("valeur à ajouter : " + str(color_array_treated[i,2]))
+            resistor_value += color_array_treated[i, 2] * math.pow(10, len(color_array_treated[:, 2]) - i - 3)
+            # print("degré du 10 :", len(color_array_treated[:, 2]) -i -3)
+            # print(resistor_value)
+        resistor_value *= math.pow(10, color_array_treated[len(color_array_treated[:, 2]) - 2, 2])
+        print("Valeur de la résistance : ", resistor_value)
+    else:
+        print("impossible de calculer la valeur de la résistance")
 
 
 def display_image(label, image, img_masked=None):
@@ -130,11 +145,11 @@ def init_color_object():
 
 
 class Color:
-    def __init__(self, color_name, value, multiplier, dark_color, light_color):
+    def __init__(self, color_name, value, multiplier, lower_color, upper_color):
         self.value = value
         self.multiplier = multiplier
-        self.dark_color = dark_color
-        self.light_color = light_color
+        self.lower_color = lower_color
+        self.upper_color = upper_color
         self.color_name = color_name
         self.cx = 0
         self.cy = 0
@@ -152,7 +167,7 @@ class Color:
         :return: img
         """
         """Get the image masked (image with only the color wanted"""
-        color_mask = cv2.inRange(img_hsv, self.dark_color, self.light_color)
+        color_mask = cv2.inRange(img_hsv, self.lower_color, self.upper_color)
         self.img_masked = cv2.bitwise_and(img, img, mask=color_mask)
         if display == 0:
             display_image(self.color_name + " masked", self.img_masked)
