@@ -74,8 +74,6 @@ def check_crop_img(img):
 
 
 
-
-
 """1) Détecter la présence d'une résistance"""
 nbre_resistor, img_masked = detect_resistor(img_res, img_background)
 
@@ -85,79 +83,37 @@ if nbre_resistor == 1:
     if img_cropped is not None:
         """3) Analyser les couleurs sur la résistance pour déterminer calculer la valeur de la résistance"""
         #display_image('image_cropped', img_cropped)
+        """a = black.get_center(img, img_hsv)
+        b = brow.get_center(img, img_hsv)
+        red.get_center(img, img_hsv)
+        orange.get_center(img, img_hsv)
+        yellow.get_center(img, img_hsv)
+        green.get_center(img, img_hsv)
+        blue.get_center(img, img_hsv)
+        violet.get_center(img, img_hsv)
+        grey.get_center(img, img_hsv)
+        white.get_center(img, img_hsv)"""
 
-"""gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-plt.imshow(gray)
-plt.show()
-blur = cv2.GaussianBlur(gray, (5,5),0)
-plt.imshow(blur)
-plt.show()
-canny = cv2.Canny(blur, 80, 110)
-plt.imshow(canny)
-plt.show()
-sum_pixel_edge = int(np.sum(canny)/255)
-print("sum pixel edge :" + str(sum_pixel_edge))
-print("e 12 brown")
-test_color_resistor = brown_background.detect_number_resistor(img, img_hsv, 2)
-print("e 12 blue")
-test_color_blue_resistor = blue_background.detect_number_resistor(img, img_hsv, 2)
+        """color_array = np.array([black.get_color_array_format(img, img_hsv),
+                                brow.get_color_array_format(img, img_hsv),
+                                red.get_color_array_format(img, img_hsv),
+                                orange.get_color_array_format(img, img_hsv),
+                                yellow.get_color_array_format(img, img_hsv),
+                                green.get_color_array_format(img, img_hsv),
+                                blue.get_color_array_format(img, img_hsv),
+                                violet.get_color_array_format(img, img_hsv),
+                                grey.get_color_array_format(img, img_hsv),
+                                white.get_color_array_format(img, img_hsv),
+                                gold.get_color_array_format(img, img_hsv)])
 
-test_color_green_resistor = green_background.detect_number_resistor(img, img_hsv, 2)
+        print(color_array)
 
-if 10 < sum_pixel_edge < 1800 and test_color_blue_resistor == 0 and test_color_green_resistor == 0 and test_color_resistor == 1:
-    if test_color_resistor == 1:
-        print("1 resistor e12")
-    else:
-        print("1 resistor no e12")
-else:
-    print("ko resistor")"""
+        color_array_treated = get_linear_regression(color_array, True)
+        calculate_resistor(color_array_treated)"""
 
-# 1 résistance = 1331
-# 2 résistance = 2093
-# np.set_printoptions(threshold=np.inf)
-# print(canny)
-"""
-plt.imshow(canny, cmap='gray')
-plt.show()
-dilated = cv2.dilate(canny,(1,1), iterations=0)
-(cnt, hierarchy) = cv2.findContours(dilated.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-cv2.drawContours(rgb, cnt, -1, (0, 255, 0), 2)
-plt.imshow(rgb)
-plt.show()
-print("resistor in the image :",len(cnt))"""
-
-"""red.get_masked_image(img, img_hsv, True)
-blue.get_masked_image(img, img_hsv, True)
-grey.get_masked_image(img, img_hsv, True)
-gold.get_masked_image(img, img_hsv, True)
-gold.get_center(img, img_hsv, 2)"""
-
-"""a = black.get_center(img, img_hsv)
-b = brow.get_center(img, img_hsv)
-red.get_center(img, img_hsv, 2)
-orange.get_center(img, img_hsv)
-yellow.get_center(img, img_hsv)
-green.get_center(img, img_hsv)
-blue.get_center(img, img_hsv, 2)
-violet.get_center(img, img_hsv)
-grey.get_center(img, img_hsv, 2)
-white.get_center(img, img_hsv)"""
-
-"""color_array = np.array([black.get_color_array_format(img, img_hsv),
-                        brow.get_color_array_format(img, img_hsv),
-                        red.get_color_array_format(img, img_hsv),
-                        orange.get_color_array_format(img, img_hsv),
-                        yellow.get_color_array_format(img, img_hsv),
-                        green.get_color_array_format(img, img_hsv),
-                        blue.get_color_array_format(img, img_hsv),
-                        violet.get_color_array_format(img, img_hsv),
-                        grey.get_color_array_format(img, img_hsv),
-                        white.get_color_array_format(img, img_hsv),
-                        gold.get_color_array_format(img, img_hsv)])
+        #envoie de la valeur de la résistance par I2C
 
 
-print(color_array)
 
-color_array_treated = get_linear_regression(color_array, True)
-calculate_resistor(color_array_treated)"""
+
+
