@@ -47,8 +47,8 @@ def pick_color(event,x,y,flags,param):
         value_upper = check_boundaries(pixel[2], 40, 1, 1)
         value_lower = check_boundaries(pixel[2], 40, 1, 0)
 
-        upper =  np.array([hue_upper, saturation_upper, value_upper])
-        lower =  np.array([hue_lower, saturation_lower, value_lower])
+        upper = np.array([hue_upper, saturation_upper, value_upper])
+        lower = np.array([hue_lower, saturation_lower, value_lower])
         print(lower, upper)
 
         #A MONOCHROME MASK FOR GETTING A BETTER VISION OVER THE COLORS

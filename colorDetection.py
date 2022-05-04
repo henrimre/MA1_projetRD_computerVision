@@ -4,6 +4,106 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 import math
 
+
+def remove_background(img, img_background):
+    difference = cv2.absdiff(img, img_background)
+    # display_image(label, difference)
+    gray_difference = cv2.cvtColor(difference, cv2.COLOR_BGR2GRAY)
+    mask_ret, mask_thresh = cv2.threshold(gray_difference, 10, 255, cv2.THRESH_BINARY)
+    # display_image(label, mask_thresh)
+    return cv2.bitwise_and(img, img, mask=mask_thresh)
+
+
+def img_preprocessing(img):
+    return cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+
+def first_reshape(img_original, display_cropped = False) :
+    img = np.copy(img_original)
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    h = hsv[:, :, 0]
+    s = hsv[:, :, 1]
+    v = hsv[:, :, 2]
+    #display_image(label, s)
+    s_ret, s_thresh = cv2.threshold(s, 100, 255, cv2.THRESH_BINARY)
+    #display_image(label, s_thresh)
+    img = cv2.bitwise_and(img, img, mask=s_thresh)
+    #display_image(label, v)
+    v_ret, v_thresh = cv2.threshold(v, 70, 255, cv2.THRESH_BINARY)
+    #display_image(label, v_thresh)
+    img = cv2.bitwise_and(img, img, mask=v_thresh)
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img_gray_blur = cv2.GaussianBlur(img_gray, (5, 5), cv2.BORDER_DEFAULT)
+    img_edge = cv2.Canny(img_gray, 50, 150)
+    half_size = 150
+    all_center_x = np.empty(10, dtype=int)
+    all_center_y = np.empty(10, dtype=int)
+    all_h = np.empty(10, dtype=int)
+    all_w = np.empty(10, dtype=int)
+
+    all_new_min_x = np.empty(10, dtype=int)
+    all_new_min_y = np.empty(10, dtype=int)
+
+    for i in range(0, 10):
+        #print(i)
+        M = cv2.moments(img_edge)
+        # print(M)
+        if M["m00"] == 0:
+            #print("error : m00 = 0")
+            break
+
+        cX = int(M["m10"] / M["m00"])
+        cY = int(M["m01"] / M["m00"])
+
+        """print("center found :")
+        print(cX)
+        print(cY)"""
+
+        all_center_x.itemset(i, cX)
+        all_center_y.itemset(i, cY)
+        img_edge_centroid = np.copy(img_edge)
+
+        new_min_x = cX - half_size if cX - half_size > 0 else 0
+        new_max_x = cX + half_size if cX + half_size < img_edge.shape[0] else img_edge.shape[1] - 1
+
+        new_min_y = cY - half_size if cY - half_size > 0 else 0
+        new_max_y = cY + half_size if cY + half_size < img_edge.shape[1] else img_edge.shape[0] - 1
+
+        """print("X limits : " + str(new_min_x) + ", " + str(new_max_x))
+        print("Y limits : " + str(new_min_y) + ", " + str(new_max_y))"""
+
+        all_new_min_x.itemset(i, new_min_x)
+        all_new_min_y.itemset(i, new_min_y)
+        img_edge = img_edge[new_min_y:new_max_y, new_min_x:new_max_x]
+        img_edge_centroid = img_edge_centroid[new_min_y:new_max_y, new_min_x:new_max_x]
+        cv2.circle(img_edge_centroid, (cX, cY), 5, (255, 255, 255), -1)
+        all_w.itemset(i, img_edge.shape[0])
+        all_h.itemset(i, img_edge.shape[1])
+
+        # display_image(label,img_edge_centroid)
+        half_size = half_size - 10
+
+    cv2.circle(img_edge, (int(img.shape[0] / 2), int(img.shape[1] / 2)), 5, (255, 255, 255), -1)
+    # display_image(label,img_edge)
+    center_x = 0
+    center_y = 0
+    for i in range(0, 10):
+        #print(str(center_x) + "+" + str(all_new_min_x[i]) + "=" + str(center_x + all_new_min_x[i]))
+        center_x = center_x + all_new_min_x[i]
+        #print(center_x)
+        center_y = center_y + all_new_min_y[i]
+
+    img_point = np.copy(img_original)
+    cv2.circle(img_point, (int(center_x), int(center_y)), 5, (255, 255, 255), -1)
+    cv2.rectangle(img_point, (center_x, center_y), (center_x + all_w[9], center_y + all_h[9]), (0, 255, 0), 2)
+    img_cropped = img_original[center_y : center_y + all_h[9], center_x : center_x + all_w[9]]
+    path = r'C:\Users\henri\Documents\HELHa\ProjetRD_image\resistor_cropped.jpg'
+    cv2.imwrite(path, img_cropped)
+    #print(img_point.shape)
+    #display_image("allez", img_point)
+    return img_cropped
+
+
 def get_linear_regression(color_array, display=None):
     creation_array = False
     for i in range(len(color_array[:, 0])):
@@ -87,7 +187,7 @@ def calculate_resistor(color_array_treated):
     resistor_value = 0
     order = 0
     # Déterminer l'emplacement de la couleur gold :
-    if color_array_treated[len(color_array_treated)-1, 2] == -1:
+    if color_array_treated[len(color_array_treated) - 1, 2] == -1:
         order = 1
     elif color_array_treated[0, 2] == -1:
         order = 1
@@ -124,10 +224,6 @@ def display_image(label, image, img_masked=None):
     cv2.destroyAllWindows()
 
 
-def img_preprocessing(path):
-    return cv2.imread(path), cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2HSV)
-
-
 '''
 def init_color_object():
     black = Color(0, 1, np.array([0, 0, 0]), np.array([0, 0, 0]))
@@ -158,6 +254,11 @@ class Color:
         self.cx_proj = 0.0
         self.cy_proj = 0.0
 
+    def delete_color(self, img, img_hsv):
+        color_mask = cv2.inRange(img_hsv, self.lower_color, self.upper_color)
+        self.img_masked = cv2.bitwise_and(img, img, mask=color_mask)
+        return img - self.img_masked
+
     def get_masked_image(self, img, img_hsv, display=None):
         """
         Give the img with only the desired color
@@ -165,13 +266,19 @@ class Color:
         :param img_hsv: img at the HSV format
         :return: img
         """
-        """Get the image masked (image with only the color wanted"""
+        """Get the image masked (image with only the wanted color)"""
         color_mask = cv2.inRange(img_hsv, self.lower_color, self.upper_color)
         self.img_masked = cv2.bitwise_and(img, img, mask=color_mask)
+        #print(color_mask.shape)
         if display == 0:
             display_image(self.color_name + " masked", self.img_masked)
         elif display == 1:
             display_image(self.color_name + " masked", img, self.img_masked)
+        elif display == 'plot':
+            plt.imshow(self.img_masked)
+            plt.show()
+        elif display == 'return':
+            return self.img_masked
         # return cv2.bitwise_and(img, img, mask=color_mask)
 
     def get_nonzero_pixel(self):
@@ -210,10 +317,10 @@ class Color:
             elif display == 2:
                 np.set_printoptions(threshold=np.inf)
                 print(thresh)
-                #print('sum :' + str(np.sum(output_color)))
+                # print('sum :' + str(np.sum(output_color)))
             elif display == 3:
                 print("shape : " + str(thresh.shape))
-                print("sum : " + str(np.sum(output_color)/255))
+                print("sum : " + str(np.sum(output_color) / 255))
             else:
                 plt.imshow(output_color)
                 plt.show()
@@ -224,23 +331,44 @@ class Color:
         self.get_center(img, img_hsv)
         return self.cx, self.cy, self.value, self.order, self.cx_proj, self.cy_proj
 
-    def detect_number_resistor(self, img, img_hsv, display = None):
+    def detect_number_resistor(self, img, img_hsv, display=None):
         self.get_masked_image(img, img_hsv)
         output_color = cv2.cvtColor(self.img_masked, cv2.COLOR_HSV2BGR)
         gray_output_color = cv2.cvtColor(output_color, cv2.COLOR_BGR2GRAY)
         ret, thresh = cv2.threshold(src=gray_output_color, thresh=0, maxval=255, type=0)
-        resistor_pixel = int(np.sum(thresh)/255)
-        if display == 1 :
+        resistor_pixel = int(np.sum(thresh) / 255)
+        if display == 1:
             display_image("masque", thresh)
         elif display == 2:
             print("resistor pixel " + self.color_name + " " + str(resistor_pixel))
 
         if resistor_pixel <= 100:
-            print("no resistance")
+            #print("no resistance")
             return 0
-        elif 90 < resistor_pixel < 500:
-            print("1 resistor detected")
+        elif 100 < resistor_pixel < 500:
+            #print("1 resistor detected")
             return 1
-        else :
-            print("2+ resistors detected")
-            return 2
+
+
+    def reshape_resistor(self, img, img_hsv, save = None):
+        self.get_masked_image(img, img_hsv)
+        """plt.imshow(self.img_masked)
+        plt.show()"""
+        img_masked_non_zero = np.nonzero(self.img_masked)
+        #print(img_masked_non_zero)
+        self.img_masked[img_masked_non_zero]
+        img_masked_transpose_non_zero = np.transpose(np.nonzero(self.img_masked))
+        img_masked_transpose_non_zero_delete = np.delete(img_masked_transpose_non_zero, 2, 1)
+        max_border = np.amax(img_masked_transpose_non_zero_delete, axis = 0)
+        """print("amax")
+        print(max_border)"""
+        min_border = np.amin(img_masked_transpose_non_zero_delete, axis = 0)
+        """print("amin")
+        print(min_border)"""
+        border_accuracy = 4
+        img_cropped = img[min_border[0] - border_accuracy: max_border[0] + border_accuracy, min_border[1] - border_accuracy : max_border[1] + border_accuracy]
+        if save is not None :
+            path = r'C:\Users\henri\Documents\HELHa\ProjetRD_image\resistor_cropped_2.jpg'
+            cv2.imwrite(path, img_cropped)
+        return img_cropped
+
