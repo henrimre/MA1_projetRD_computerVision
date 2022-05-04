@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 import math
 
-
 def get_linear_regression(color_array, display=None):
     creation_array = False
     for i in range(len(color_array[:, 0])):
@@ -207,7 +206,14 @@ class Color:
         if display is not None:
             cv2.circle(output_color, (self.cx, self.cy), 2, (255, 255, 0), -1)
             if display == 1:
-                display_image("Centroïde", output_color)
+                display_image("Centroïde", thresh)
+            elif display == 2:
+                np.set_printoptions(threshold=np.inf)
+                print(thresh)
+                #print('sum :' + str(np.sum(output_color)))
+            elif display == 3:
+                print("shape : " + str(thresh.shape))
+                print("sum : " + str(np.sum(output_color)/255))
             else:
                 plt.imshow(output_color)
                 plt.show()
@@ -217,3 +223,24 @@ class Color:
     def get_color_array_format(self, img, img_hsv):
         self.get_center(img, img_hsv)
         return self.cx, self.cy, self.value, self.order, self.cx_proj, self.cy_proj
+
+    def detect_number_resistor(self, img, img_hsv, display = None):
+        self.get_masked_image(img, img_hsv)
+        output_color = cv2.cvtColor(self.img_masked, cv2.COLOR_HSV2BGR)
+        gray_output_color = cv2.cvtColor(output_color, cv2.COLOR_BGR2GRAY)
+        ret, thresh = cv2.threshold(src=gray_output_color, thresh=0, maxval=255, type=0)
+        resistor_pixel = int(np.sum(thresh)/255)
+        if display == 1 :
+            display_image("masque", thresh)
+        elif display == 2:
+            print("resistor pixel " + self.color_name + " " + str(resistor_pixel))
+
+        if resistor_pixel <= 100:
+            print("no resistance")
+            return 0
+        elif 90 < resistor_pixel < 500:
+            print("1 resistor detected")
+            return 1
+        else :
+            print("2+ resistors detected")
+            return 2
