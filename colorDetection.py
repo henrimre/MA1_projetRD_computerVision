@@ -187,24 +187,28 @@ def calculate_resistor(color_array_treated):
     resistor_value = 0
     order = 0
     # Déterminer l'emplacement de la couleur gold :
-    if color_array_treated[len(color_array_treated) - 1, 2] == -1:
-        order = 1
-    elif color_array_treated[0, 2] == -1:
-        order = 1
-        color_array_treated = np.flip(color_array_treated, axis=0)
-        print("flip color_array_treated")
-        # print(color_array_treated)
+    if len(color_array_treated) == 4:
+        if color_array_treated[len(color_array_treated) - 1, 2] == -1:
+            order = 1
+        elif color_array_treated[0, 2] == -1:
+            order = 1
+            color_array_treated = np.flip(color_array_treated, axis=0)
+            #print("flip color_array_treated")
+            # print(color_array_treated)
 
-    if order != 0:
-        for i in range(len(color_array_treated[:, 0]) - 2):
-            # print("valeur à ajouter : " + str(color_array_treated[i,2]))
-            resistor_value += color_array_treated[i, 2] * math.pow(10, len(color_array_treated[:, 2]) - i - 3)
-            # print("degré du 10 :", len(color_array_treated[:, 2]) -i -3)
-            # print(resistor_value)
-        resistor_value *= math.pow(10, color_array_treated[len(color_array_treated[:, 2]) - 2, 2])
-        print("Valeur de la résistance : ", resistor_value)
+        if order != 0:
+            for i in range(len(color_array_treated[:, 0]) - 2):
+                # print("valeur à ajouter : " + str(color_array_treated[i,2]))
+                resistor_value += color_array_treated[i, 2] * math.pow(10, len(color_array_treated[:, 2]) - i - 3)
+                # print("degré du 10 :", len(color_array_treated[:, 2]) -i -3)
+                # print(resistor_value)
+            resistor_value *= math.pow(10, color_array_treated[len(color_array_treated[:, 2]) - 2, 2])
+            print("Valeur de la résistance : ", resistor_value)
+        else:
+            print("impossible de calculer la valeur de la résistance")
     else:
-        print("impossible de calculer la valeur de la résistance")
+        print("Erreur dans la reconnaissance des couleurs")
+        #envoyer code erreur I2C
 
 
 def display_image(label, image, img_masked=None):
@@ -328,7 +332,7 @@ class Color:
         return self.cx, self.cy
 
     def get_color_array_format(self, img, img_hsv):
-        self.get_center(img, img_hsv)
+        self.get_center(img, img_hsv,4)
         return self.cx, self.cy, self.value, self.order, self.cx_proj, self.cy_proj
 
     def detect_number_resistor(self, img, img_hsv, display=None):
@@ -348,7 +352,6 @@ class Color:
         elif 100 < resistor_pixel < 500:
             #print("1 resistor detected")
             return 1
-
 
     def reshape_resistor(self, img, img_hsv, save = None):
         self.get_masked_image(img, img_hsv)
